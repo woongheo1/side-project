@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+          "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+          
+<mapper namespace="a.b.c.com.project.comment.dao.CommentDAO">
+
+<insert id="commentInsert" parameterType="commentvo" >
+ 
+	INSERT INTO PROJECT_BOARD_COMMENT( 	
+								CNUM, 
+								CCONTENT, 
+	                           	MNUM,  
+	                           	MNICK,  
+	                           	PNUM,  
+	                           	DELETEYN,
+	                           	INSERTDATE,
+	                           	UPDATEDATE
+	                        ) 
+	                  VALUES
+	                  		( 	
+	                  			(SELECT 'C' || LPAD(NVL(MAX(SUBSTR(CNUM, -4)), 0) + 1, 4, 0) FROM PROJECT_BOARD_COMMENT), 
+	                  			#{ccontent, jdbcType=VARCHAR}, 
+	                  			#{mnum, jdbcType=VARCHAR},
+	                          	#{mnick, jdbcType=VARCHAR},  
+	                          	#{pnum, jdbcType=VARCHAR},  
+	                          	'Y',
+	                          	SYSDATE,
+	                          	SYSDATE
+	                        )
+</insert>
+
+
+<select id="commentSelectAll" parameterType="commentvo" resultType="commentvo">
+	
+		SELECT 	A.CNUM 			CNUM
+		       ,A.CCONTENT  	CCONTENT
+		       ,A.MNICK 		MNICK 
+	           ,A.INSERTDATE 	INSERTDATE
+		FROM 	PROJECT_BOARD_COMMENT A
+		WHERE 	DELETEYN = 'Y' 
+		AND 	A.PNUM = #{pnum}
+		ORDER BY 1 DESC
+</select>
+
+<update id="commentDelete" parameterType="commentvo">
+	
+	UPDATE 	PROJECT_BOARD_COMMENT 
+	SET 	DELETEYN = 'N', 
+			INSERTDATE = SYSDATE
+	WHERE 	DELETEYN = 'Y' 
+	AND 	CNUM = #{cnum}
+	
+</update>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<select id="commentLikeSelect" parameterType="commentvo" resultType="commentvo">	
+	
+		SELECT 	A.CNUM  	CNUM 	
+		FROM 	PROJECT_BOARD_COMMENT A
+		WHERE 	A.DELETEYN = 'Y' 
+		AND     A.MNUM = #{mnum}	
+		AND     A.CNUM = #{cnum}
+		
+</select>
+
+<select id="commentLikeSelectAll" parameterType="commentvo" resultType="commentvo">	
+	
+		SELECT 	*
+		FROM 	PROJECT_BOARD_COMMENT A
+		WHERE 	A.DELETEYN = 'Y' 
+		AND     A.MNUM = #{mnum}	
+		AND     A.CNUM = #{cnum}
+		
+</select>
+
+
+<insert id="commentLikeInsert" parameterType="commentvo" >
+ 
+	INSERT INTO PROJECT_BOARD_COMMENT ( MNUM,
+										CNUM, 									
+										DELETEYN, 
+										INSERTDATE, 
+										UPDATEDATE)
+            				VALUES(	 #{mnum}, 
+	            					 #{cnum},  	            				 				
+	            					 'Y', 
+	            					 SYSDATE, 
+	            					 SYSDATE)
+	            					 
+	            					 
+</insert>
+
+
+<update id="commentLikeUpdate" parameterType="commentvo" >
+    
+	UPDATE 	PROJECT_BOARD_COMMENT 
+	   SET  CLIKES = CLIKES + 1
+		   ,UPDATEDATE = SYSDATE
+	 WHERE  MNUM = #{mnum}
+	 AND    CNUM = #{cnum}	 
+	 
+</update>
+
+</mapper>      

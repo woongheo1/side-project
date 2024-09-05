@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" 
+		  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	<typeAliases>
+		<!-- 회원, 게시판 -->
+		<typeAlias type="a.b.c.com.project.post.vo.PostVO" alias="postvo"/>
+		<typeAlias type="a.b.c.project_login.vo.LoginVO" alias="loginvo"/>
+		<!--  댓글  -->
+		<typeAlias type="a.b.c.com.project.comment.vo.CommentVO" alias="commentvo"/>
+		<!--  회원가입   -->
+		<typeAlias type="a.b.c.com.project.member.vo.MemberVO" alias="memberVO"/>
+		<!--   레시피  -->
+<typeAlias type="a.b.c.com.project.recipe.vo.RecipeVO" alias="recipevo"/>
+	</typeAliases>
+</configuration>

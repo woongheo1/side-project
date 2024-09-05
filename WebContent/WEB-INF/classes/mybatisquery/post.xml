@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+          "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+          
+<mapper namespace="a.b.c.com.project.post.dao.PostDAO">
+
+<insert id="postInsert" parameterType="postvo" >
+ 
+INSERT INTO PROJECT_BOARD_POST  (PNUM, PTITLE, PCONTENT, PCATEGORY, CNUM, MNUM, MNICK, PPHOTO, DELETEYN, INSERTDATE, UPDATEDATE)
+                        VALUES  ((SELECT 'P' || LPAD(NVL(MAX(SUBSTR(PNUM, -4)), 0) + 1, 4, 0) FROM PROJECT_BOARD_POST), #{ptitle}, #{pcontent}, #{pcategory}, '0001', #{mnum}, #{mnick}, #{pphoto}, 'Y',
+                                 TO_CHAR(SYSDATE, 'YYYY.MM.DD'), TO_CHAR(SYSDATE, 'YYYY.MM.DD'))
+</insert>
+
+<select id="postSelectAll" parameterType="postvo" resultType="postvo">	
+	SELECT * FROM (
+		SELECT 	A.PNUM 		PNUM
+		       ,A.PTITLE 	PTITLE
+		       ,A.PCONTENT	PCONTENT
+		       ,A.PCATEGORY PCATEGORY
+		       ,A.PLIKES	PLIKES
+		       ,A.CNUM 		CNUM	
+		       ,A.MNUM		MNUM
+		       ,A.MNICK		MNICK
+		       ,A.PPHOTO	PPHOTO
+		       ,A.BHIT		BHIT
+		       ,A.DELETEYN 	DELETEYN
+		       ,TO_CHAR(A.INSERTDATE, 'YYYY-MM-DD') INSERTDATE
+		       ,TO_CHAR(A.UPDATEDATE, 'YYYY-MM-DD') UPDATEDATE	 	
+		       <!--  ? : 페이지 사이즈 : pageSize  -->
+		       ,CEIL(ROW_NUMBER() OVER(ORDER BY A.PNUM)/ #{pageSize} ) pageSize		
+			   ,COUNT(A.PNUM) OVER() AS totalCount 	      
+		FROM 	PROJECT_BOARD_POST A
+		WHERE 	A.DELETEYN = 'Y' 	
+		ORDER BY 1 DESC  
+	    <!--  ? : 현재 페이지 : curPage -->
+	) WHERE pageSize = #{curPage}
+		
+	
+</select>
+
+<select id="postSelect" parameterType="postvo" resultType="postvo">	
+	
+		SELECT 	A.PNUM 		PNUM
+		       ,A.PTITLE 	PTITLE
+		       ,A.PCONTENT	PCONTENT
+		       ,A.PCATEGORY PCATEGORY
+		       ,A.PLIKES	PLIKES
+		       ,A.CNUM 		CNUM	
+		       ,A.MNUM		MNUM
+		       ,A.MNICK		MNICK
+		       ,A.PPHOTO	PPHOTO
+		       ,A.BHIT		BHIT
+		       ,A.DELETEYN 	DELETEYN
+		       ,TO_CHAR(A.INSERTDATE, 'YYYY-MM-DD') INSERTDATE
+		       ,TO_CHAR(A.UPDATEDATE, 'YYYY-MM-DD') UPDATEDATE
+		<!-- 
+			FROM 	SPRING_BOARD A
+			FULL OUTER JOIN SPRING_BOARD_LIKE B
+			ON   A.BNUM = B.BNUM
+			WHERE 	A.DELETEYN = 'Y' 
+			AND     A.BNUM = #{bnum}	
+		 -->       
+		FROM 	PROJECT_BOARD_POST A		
+		WHERE   A.DELETEYN = 'Y' 
+		AND     A.PNUM = #{pnum}	
+
+</select>
+
+<select id="postPwCheck" parameterType="postvo" resultType="postvo">	
+	
+		SELECT 	A.BNUM 		BNUM		    
+		       ,A.BPW 		BPW		   		     
+		FROM 	SPRING_BOARD A
+		WHERE 	A.DELETEYN = 'Y' 
+		AND     A.BNUM = #{bnum}	
+		AND     A.BPW = #{bpw}
+		
+</select>
+
+<select id="postLikeSelect" parameterType="postvo" resultType="postvo">	
+	
+		SELECT 	A.PLIKES 	PLIKES		    	   		     
+		FROM 	PROJECT_BOARD_POST A
+		WHERE 	A.DELETEYN = 'Y' 
+		AND     A.PNUM = #{pnum}	
+		
+</select>
+
+<update id="postBhit" parameterType="postvo" >
+ 
+	UPDATE  PROJECT_BOARD_POST 
+		SET BHIT = (SELECT NVL(MAX(BHIT), 0) + 1 FROM PROJECT_BOARD_POST WHERE DELETEYN = 'Y' AND PNUM = #{pnum})
+		   <!--,UPDATEDATE = SYSDATE  -->
+	WHERE   DELETEYN = 'Y'
+	AND     PNUM = #{pnum}		   
+</update>
+
+<update id="postUpdate" parameterType="postvo" >
+
+	UPDATE  PROJECT_BOARD_POST
+   	   SET	PCONTENT    = #{pcontent}
+   	   	   ,PTITLE      = #{ptitle} 
+	  	   ,UPDATEDATE 	= SYSDATE
+	WHERE   DELETEYN = 'Y'
+	AND     PNUM = #{pnum}	
+</update>
+
+<update id="postDelete" parameterType="postvo" >
+
+	UPDATE  PROJECT_BOARD_POST
+   	   SET	DELETEYN 	= 'N'
+      	   ,UPDATEDATE  = SYSDATE
+	WHERE  	DELETEYN    = 'Y'
+	AND    	PNUM = #{pnum}	
+</update>
+
+<update id="postLikeUpdate" parameterType="postvo" >
+
+	UPDATE  PROJECT_BOARD_POST 
+		SET PLIKES = (SELECT NVL(MAX(PLIKES), 0) + 1 FROM PROJECT_BOARD_POST WHERE DELETEYN = 'Y' AND PNUM = #{pnum})
+		   <!--,UPDATEDATE = SYSDATE  -->
+	WHERE   DELETEYN = 'Y'
+	AND     PNUM = #{pnum}	
+</update>
+	
+</mapper>      

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+          "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="a.b.c.com.project.recipe.dao.RecipeDAO">
+
+<insert id="recipeInsert" parameterType="recipevo">
+    INSERT INTO PROJECT_BOARD_RECIPE (RNUM, RTITLE, RCONTENT, RCATEGORY, RPHOTO, INSERTDATE, UPDATEDATE, MMANAGER, DELETEYN) 
+    		VALUES ( (SELECT 'R' || LPAD(NVL(MAX(SUBSTR(RNUM, -4)), 0) + 1, 4, 0) FROM PROJECT_BOARD_RECIPE)
+    		,#{rtitle,jdbcType=VARCHAR}
+    		,#{rcontent,jdbcType=VARCHAR}
+    		,#{rcategory,jdbcType=VARCHAR}
+    		,#{rphoto,jdbcType=VARCHAR}
+    		,SYSDATE
+    		,SYSDATE
+    		,'Y'
+    		,'Y')
+</insert>
+
+<select id="recipeSelectAll" resultType="recipevo">
+    SELECT 
+        RNUM,
+        RTITLE,
+        RCONTENT,
+        RCATEGORY,
+        RPHOTO,
+        TO_CHAR(INSERTDATE, 'YYYY-MM-DD') AS INSERTDATE,
+        TO_CHAR(UPDATEDATE, 'YYYY-MM-DD') AS UPDATEDATE,
+        MMANAGER,
+        DELETEYN
+    FROM PROJECT_BOARD_RECIPE
+    WHERE DELETEYN = 'Y'
+
+    ORDER BY RNUM DESC
+</select>
+
+
+<select id="recipeSelect" resultType="recipevo">
+    SELECT
+        RNUM,
+        RTITLE,
+        RCONTENT,
+        RCATEGORY,
+        RPHOTO,
+        TO_CHAR(TO_DATE(INSERTDATE), 'YYYY-MM-DD') AS INSERTDATE,
+        TO_CHAR(TO_DATE(UPDATEDATE), 'YYYY-MM-DD') AS UPDATEDATE,
+        MMANAGER,
+        DELETEYN
+    FROM PROJECT_BOARD_RECIPE
+    WHERE RNUM = #{rnum, jdbcType=VARCHAR}
+    ORDER BY RNUM
+</select>
+
+
+<update id="recipeUpdate" parameterType="recipevo">
+    UPDATE PROJECT_BOARD_RECIPE
+    SET
+        RTITLE = #{rtitle,jdbcType=VARCHAR},
+        RCONTENT = #{rcontent,jdbcType=VARCHAR},
+        RCATEGORY = #{rcategory,jdbcType=VARCHAR},
+        RPHOTO = #{rphoto,jdbcType=VARCHAR},
+        UPDATEDATE = SYSDATE,
+        MMANAGER = #{mmanager}
+    WHERE RNUM = #{rnum}
+</update>
+
+<delete id="recipeDelete" parameterType="recipevo">
+    DELETE FROM PROJECT_BOARD_RECIPE
+    WHERE RNUM = #{rnum}
+</delete>
+
+
+</mapper>         	  
